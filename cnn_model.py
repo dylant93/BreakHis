@@ -237,7 +237,7 @@ def train(img_dir, model_dir, img_size=64, colour_channels=3, batch_size=128, tr
         restore_or_initialize(sess, saver, checkpoint_dir)
 
         for epoch in range(training_epochs):
-            print("Epoch "+epoch)
+            print(epoch)
             batch_count = int(data.train.num_examples / batch_size)
 
             for i in range(batch_count):
