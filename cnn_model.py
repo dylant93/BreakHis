@@ -215,7 +215,7 @@ def train(img_dir, model_dir, img_size=64, colour_channels=3, batch_size=128, tr
 
     log_dir = os.path.join(os.path.abspath(model_dir), 'tensorflow/cnn/logs/cnn_with_summaries')
     checkpoint_dir = os.path.join(os.path.abspath(model_dir), 'tensorflow/cnn/model')
-
+    print(checkpoint_dir)
     data, category_ref = read_img_sets(img_dir + '/train', img_size, validation_size=.2)
 
     flat_img_size = flat_img_shape(img_size, colour_channels)
@@ -233,11 +233,11 @@ def train(img_dir, model_dir, img_size=64, colour_channels=3, batch_size=128, tr
     writer = tf.summary.FileWriter(log_dir, graph=tf.get_default_graph())
 
     with tf.Session() as sess:
-
+        print("session beginning")
         restore_or_initialize(sess, saver, checkpoint_dir)
 
         for epoch in range(training_epochs):
-
+            print("Epoch "+epoch)
             batch_count = int(data.train.num_examples / batch_size)
 
             for i in range(batch_count):
@@ -254,6 +254,7 @@ def train(img_dir, model_dir, img_size=64, colour_channels=3, batch_size=128, tr
                 writer.add_summary(summary, epoch * batch_count + i)
 
             if epoch % 5 == 0:
+                print("logging progress")
                 log_progress(sess, saver, cost, accuracy, epoch,
                              test_feed_dict={x: x_test_batch, y_true: y_test_batch, keep_prob: 1.0},
                              checkpoint_path=os.path.join(checkpoint_dir, 'model.ckpt'))
