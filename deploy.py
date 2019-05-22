@@ -149,9 +149,9 @@ def main():
     	#print(infer_labels,infer_probabilities)
        show_inference_results(image_name_list[index], infer_labels,infer_probabilities)
        t+=checktime
-    print(t/counter2)
-    print(counter)
-    print(counter2)
+    print("Avg Time: ",t/counter2)
+    print(counter," of ",counter2, " correct")
+    #print(counter2)
     # clean up the NCAPI devices
     do_cleanup(device, graph)
 
