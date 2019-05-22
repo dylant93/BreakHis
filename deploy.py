@@ -12,7 +12,6 @@ import time
 import cv2
 import os
 import sys
-#import matplotlib.pyplot as plt
 
 counter=0
 counter2=0
@@ -29,27 +28,20 @@ def do_initialize(): # -> (mvnc.Device, mvnc.Graph):
     graph : mvnc.Graph
         The allocated graph to use for inferences.  Will be None if couldn't allocate graph
     """
-    # ***************************************************************
-    # Get a list of ALL the sticks that are plugged in
-    # ***************************************************************
+
     devices = mvnc.EnumerateDevices()
     if len(devices) == 0:
             print('Error - No devices found')
             return (None, None)
-
-    # ***************************************************************
-    # Pick the first stick to run the network
-    # ***************************************************************
     device = mvnc.Device(devices[0])
-
-    # ***************************************************************
-    # Open the NCS
-    # ***************************************************************
     device.OpenDevice()
 
     filefolder = os.path.dirname(os.path.realpath(__file__))
-    graph_filename = filefolder + '/modelpredict.graph'
     
+    ##Change this accordingly
+    ########################################################################################
+    graph_filename = filefolder + '/modelpredict.graph' 
+    ########################################################################################
     try :
         with open(graph_filename, mode='rb') as f:
             in_memory_graph = f.read()
@@ -61,63 +53,20 @@ def do_initialize(): # -> (mvnc.Device, mvnc.Graph):
     return device, graph
 
 def do_inference(graph, image_filename):
-    """ executes one inference which will determine the top classifications for an image file.
-    Parameters
-    ----------
-    graph : Graph
-        The graph to use for the inference.  This should be initialize prior to calling
-    image_filename : string
-        The filename (full or relative path) to use as the input for the inference.
-    number_results : int
-        The number of results to return, defaults to 5
-    Returns
-    -------
-    labels : List[str]
-        The top labels for the inference.  labels[i] corresponds to probabilities[i]
-    probabilities: List[numpy.float16]
-        The top probabilities for the inference. probabilities[i] corresponds to labels[i]
-    """
- 
-    # text labels for each of the possible classfications
     labels=['Ben', 'Mal']
     global checktime
     
-    # Load image from disk and preprocess it to prepare it for the network
-    # assuming we are reading a .jpg or .png color image so need to convert it
-    # single channel gray scale image for mnist network.
-    # Then resize the image to the size of image the network was trained with.
-    # Next convert image to floating point format and normalize
-    # so each pixel is a value between 0.0 and 1.0
-    #image_for_inference = plt.imread(image_filename)
-    #image_for_inference
     image_for_inference = cv2.imread(image_filename)
     image_for_inference = cv2.resize(image_for_inference, (64, 64), cv2.INTER_LINEAR)
     imgbin = np.empty((1,12288),np.float16)
     imgbin[0] = image_for_inference.flatten()
     imgbin = np.multiply(imgbin,1.0/255.0)
-    #print(imgbin)  
-    # Start the inference by sending to the device/graph
+
     start=time.time()
     graph.LoadTensor(imgbin, None)
-
-    # Get the result from the device/graph.  userobj should be the
-    # same value that was passed in LoadTensor above.
     output, userobj = graph.GetResult()
-    #print(output[0])
-    # sort indices in order of highest probabilities
-   # five_highest_indices = (-output).argsort()[:number_results]
-
-    # get the labels and probabilities for the top results from the inference
-   # inference_labels = []
-   # inference_probabilities = []
-
-#    for index in range(0, number_results):
-#        inference_probabilities.append(str(output[five_highest_indices[index]]))
-#        inference_labels.append(labels[five_highest_indices[index]])
-
-   # return inference_labels, inference_probabilities
-   # print("hello",(-output).argsort())
     end=time.time()
+    
     checktime=end-start
     return labels, output
     
@@ -138,23 +87,7 @@ def do_cleanup(device, graph):
 
 
 def show_inference_results(image_filename, infer_labels, infer_probabilities):
-    """Print out results of a single inference to the console.
-    Parameters
-    ----------
-    image_filename : str
-                     The name of the image file for the inference
-    infer_labels : List[str]
-                   The resulting labels from the inference in order
-                   of most likely to least likely.
-                   Must be the same number of items as infer_probabilities.
-    infer_probabilities : List[numpy.float16]
-                          The resulting probabilities from the inference
-                          in order of most likely to least likely.
-                          Must be the same number of items as infer_labels
-    Returns
-    -------
-    None
-    """
+
     global counter2
     global counter
     global checktime
@@ -163,7 +96,6 @@ def show_inference_results(image_filename, infer_labels, infer_probabilities):
     print("\n")
     print('-----------------------------------------------------------')
     correct =(infer_probabilities.argsort()[1])
-
     
     pathname = os.path.basename(image_filename)
     print(infer_probabilities.argsort()[1])
@@ -188,10 +120,7 @@ def show_inference_results(image_filename, infer_labels, infer_probabilities):
     
     
 def main():
-    """ Main function, return an int for program return value
-    Opens device, reads graph file, runs inferences on files in digit_images
-    subdirectory, prints results, closes device
-    """
+    
     global checktime
     t=0
     # get list of all the .png files in the image directory
@@ -214,7 +143,7 @@ def main():
         quit(1)
 
     print(image_name_list)
-    # lopt through all the input images and run inferences and show results
+    # loot through all the input images and run inferences and show results
     for index in range(0, len(image_name_list)):
        infer_labels, infer_probabilities = do_inference(graph, image_name_list[index])
     	#print(infer_labels,infer_probabilities)
