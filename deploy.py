@@ -4,7 +4,7 @@ Created on Fri Jan 18 00:44:55 2019
 
 @author: holy_
 """
-
+#Use python3
 from mvnc import mvncapi as mvnc
 import numpy as np
 import argparse
